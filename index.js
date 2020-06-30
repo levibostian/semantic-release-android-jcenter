@@ -1,33 +1,26 @@
 const {defaultTo} = require('lodash');
 const AggregateError = require('aggregate-error');
 const verifyPluginConfig = require('./lib/verify-config');
-const verifyPodAuth = require('./lib/verify-auth');
-const verifyCliInstalled = require('./lib/verify-cli-installed');
-const verifyPodLint = require('./lib/verify-pod-lint');
-const preparePod = require('./lib/prepare');
-const publishPod = require('./lib/publish');
+const verifyAuth = require('./lib/verify-auth');
+const verifyTaskInstalled = require('./lib/verify-cli-installed');
+const prepareLib = require('./lib/prepare');
+const publishLib = require('./lib/publish');
 
 // Let verified;
 let prepared;
 
 async function verifyConditions(pluginConfig, context) {
   // Set default values for config
-  pluginConfig.podLint = defaultTo(pluginConfig.podLint, true);
-  pluginConfig.podLintArgs = defaultTo(pluginConfig.podLintArgs, '');
-  pluginConfig.podPushArgs = defaultTo(pluginConfig.podPushArgs, '');
+  pluginConfig.checkAuthEnvVars = defaultTo(pluginConfig.checkAuthEnvVars, true);
 
   const errors = verifyPluginConfig(pluginConfig);
 
   try {
-    // 1. Verify `pod` command exists
-    await verifyCliInstalled(pluginConfig, context);
+    // 1. Verify gradle task exists
+    await verifyTaskInstalled(pluginConfig, context);
 
-    // 2. Verify `COCOAPODS_TRUNK_TOKEN` environment variable exists
-    // 3. Verify `pod trunk me` is successful.
-    await verifyPodAuth(pluginConfig, context);
-
-    // 4. Verify `pod lib lint` is successful
-    await verifyPodLint(pluginConfig, context);
+    // 2. Verify auth environment variables exists
+    await verifyAuth(pluginConfig, context);
   } catch (error) {
     errors.push(...error);
   }
@@ -40,16 +33,16 @@ async function verifyConditions(pluginConfig, context) {
 }
 
 async function prepare(pluginConfig, context) {
-  await preparePod(pluginConfig, context);
+  await prepareLib(pluginConfig, context);
   prepared = true;
 }
 
 async function publish(pluginConfig, context) {
   if (!prepared) {
-    await preparePod(pluginConfig, context);
+    await prepareLib(pluginConfig, context);
   }
 
-  return publishPod(pluginConfig, context);
+  return publishLib(pluginConfig, context);
 }
 
 module.exports = {verifyConditions, prepare, publish};
