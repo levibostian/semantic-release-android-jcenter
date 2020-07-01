@@ -13,10 +13,10 @@ test.beforeEach((t) => {
   t.context.stderr = new WritableStreamBuffer();
 });
 
-test('Update podspec', async (t) => {
+test('Update gradle properties', async (t) => {
   const cwd = tempy.directory();
-  const packagePath = path.resolve(cwd, 'Test.podspec');
-  await outputFile(packagePath, "s.version = '0.0.1'");
+  const packagePath = path.resolve(cwd, 'gradle.properties');
+  await outputFile(packagePath, 'version=0.0.1');
 
   await prepare(
     {},
@@ -31,19 +31,16 @@ test('Update podspec', async (t) => {
   );
 
   // Verify package.json has been updated
-  t.is(await readFile(packagePath, 'utf-8'), `s.version = '1.0.0'`);
+  t.is(await readFile(packagePath, 'utf-8'), `version=1.0.0`);
 
   // Verify the logger has been called with the version updated
-  t.deepEqual(t.context.log.args[0], [`Write version 1.0.0 to ${cwd}/*.podspec`]);
+  t.deepEqual(t.context.log.args[0], [`Write version 1.0.0 to ${cwd}/gradle.properties`]);
 });
 
 test('Preserve indentation and newline', async (t) => {
   const cwd = tempy.directory();
-  const packagePath = path.resolve(cwd, 'Test.podspec');
-  await outputFile(
-    packagePath,
-    `Pod::Spec.new do |s|\n  s.name             = 'Teller'\n  s.version             = '0.0.1'\n\n`
-  );
+  const packagePath = path.resolve(cwd, 'gradle.properties');
+  await outputFile(packagePath, `# comment here\nuseJetpack=true\nversion             = 0.0.1\n\n`);
 
   await prepare(
     {},
@@ -58,8 +55,5 @@ test('Preserve indentation and newline', async (t) => {
   );
 
   // Verify podspec has been updated
-  t.is(
-    await readFile(packagePath, 'utf-8'),
-    `Pod::Spec.new do |s|\n  s.name             = 'Teller'\n  s.version             = '1.0.0'\n\n`
-  );
+  t.is(await readFile(packagePath, 'utf-8'), `# comment here\nuseJetpack=true\nversion             =1.0.0\n\n`);
 });

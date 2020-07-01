@@ -1,6 +1,6 @@
 {
-  "name": "semantic-release-cocoapods",
-  "description": "Cocoapods publishing plugin for semantic-release ",
+  "name": "semantic-release-android-jcenter",
+  "description": "Plugin for semantic-release to deploy Android libraries to JCenter (Bintray). ",
   "version": "0.0.0-development",
   "author": "Levi Bostian (https://github.com/levibostian/)",
   "ava": {
@@ -10,7 +10,7 @@
     "timeout": "2m"
   },
   "bugs": {
-    "url": "https://github.com/levibostian/semantic-release-cocoapods/issues"
+    "url": "https://github.com/levibostian/semantic-release-android-jcenter/issues"
   },
   "dependencies": {
     "@semantic-release/error": "^2.2.0",
@@ -33,10 +33,12 @@
     "lib",
     "index.js"
   ],
-  "homepage": "https://github.com/levibostian/semantic-release-cocoapods#readme",
+  "homepage": "https://github.com/levibostian/semantic-release-android-jcenter#readme",
   "keywords": [
-    "cocoapods",
+    "bintray",
+    "jcenter",
     "publish",
+    "android",
     "registry",
     "semantic-release",
     "version"
@@ -67,7 +69,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/levibostian/semantic-release-cocoapods.git"
+    "url": "https://github.com/levibostian/semantic-release-android-jcenter.git"
   },
   "scripts": {
     "codecov": "codecov -f coverage/coverage-final.json",

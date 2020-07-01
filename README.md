@@ -1,60 +1,55 @@
-[![Travis](https://travis-ci.com/levibostian/semantic-release-cocoapods.svg?branch=master)](https://travis-ci.org/levibostian/semantic-release-cocoapods)
-[![npm latest version](https://img.shields.io/npm/v/semantic-release-cocoapods/latest.svg)](https://www.npmjs.com/package/semantic-release-cocoapods)
+[![Travis](https://travis-ci.com/levibostian/semantic-release-android-jcenter.svg?branch=master)](https://travis-ci.org/levibostian/semantic-release-android-jcenter)
+[![npm latest version](https://img.shields.io/npm/v/semantic-release-android-jcenter/latest.svg)](https://www.npmjs.com/package/semantic-release-android-jcenter)
 
-# semantic-release-cocoapods
+# semantic-release-android-jcenter
 
-[**semantic-release**](https://github.com/semantic-release/semantic-release) plugin to publish a [cocoapods](https://cocoapods.org/) package.
+[**semantic-release**](https://github.com/semantic-release/semantic-release) plugin to deploy an Android library to the JCenter Maven repository (well, technically we deploy to a [Bintray](https://bintray.com) Maven repository which can then get accepted into JCenter. See [this faq](https://github.com/levibostian/Android-JCenter#faq) to learn more).
 
-| Step               | Description                                                                                                                                                               |
-|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `verifyConditions` | Verify `pod` command exists, `COCOAPODS_TRUNK_TOKEN` environment variable is set, `pod trunk me` is successful. Run `pod lib lint` to verify the pod is ready to publish. |
-| `prepare`          | Update the `podspec` version.                                                                                                                                             |
-| `publish`          | Publish the cocoapods pod to the registry.                                                                                                                                |
+> Tip: If you're an Android developer and you are not sure where to start to get your Android library into JCenter, [check out this project](https://github.com/levibostian/Android-JCenter) to help you out. If you use that guide, you can use this plugin with ease. 
+
+| Step               | Description                                                                      |
+|--------------------|----------------------------------------------------------------------------------|
+| `verifyConditions` | Verify Gradle `bintrayUpload` task exists, make sure authenticated with Bintray. |
+| `prepare`          | Update the `gradle.properties` version.                                          |
+| `publish`          | Run `./gradlew bintrayUpload` to deploy to Bintray.                              |
 
 ## Install
 
 ```bash
-$ npm install semantic-release-cocoapods -D
+$ npm install semantic-release-android-jcenter -D
 ```
+
+## Requirements 
+
+> Tip: If you followed [this guide](https://github.com/levibostian/Android-JCenter) you have met all of the requirements. 
+
+The only requirements of this project is...
+1. The gradle task `bintrayUpload` is installed.  
+2. You define the version of your code in the project's `gradle.properties` file like this:
+```
+version=1.0.0
+```
+> Tip: You can reference this value in your `build.gradle` files with `project.findProperty('version')`
 
 ## Usage
 
-First, make sure that [cocoapods is installed on your machine](https://guides.cocoapods.org/using/getting-started.html#installation).
+1. Make sure to install the Bintray gradle plugin and Android Maven plugin. This document does not cover how to do this as (1) there are multiple ways to do this and (2) it's better documented elsewhere. Check out [this guide](https://github.com/levibostian/Android-JCenter) to help you out. 
 
-The plugin is recommended be configured in the [**semantic-release** configuration file](https://github.com/semantic-release/semantic-release/blob/master/docs/usage/configuration.md#configuration). This is because this plugin must exist *after* [@semantic-release/github](https://github.com/semantic-release/github). Cocoapods requires a GitHub tag exists to make a release.
+2. You need to be authenticated with Bintray. You can do this via [environment variables or a gradle config file](https://github.com/bintray/gradle-bintray-plugin#step-3-add-the-bintray-configuration-closure-to-your-buildgradle-file). 
 
-```json
-{
-  "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    "@semantic-release/github",
-    "semantic-release-cocoapods"
-  ]
-}
-```
+3. Setup each of your Android library modules in your Android Studio project to deploy to Bintray. 
 
 ## Configuration
 
-### Cocoapods authentication
+#### Disable Bintray uploading for module 
 
-The npm authentication configuration is **required** and can be set via [environment variables](#environment-variables).
-
-### Environment variables
-
-To use this plugin and ultimately publish a cocoapods package, you must set these environment variables. 
-
-| Variable                | Description                                                                                                      |
-|-------------------------|------------------------------------------------------------------------------------------------------------------|
-| `COCOAPODS_TRUNK_TOKEN` | [Created token](https://fuller.li/posts/automated-cocoapods-releases-with-ci/) to push pod to cocoapods.org.     |
+If there is a module that you do not want deployed, then make sure to disable Bintray uploading in the module's `build.gradle` file. Because you have the option to enable Bintray uploading for each module individually, this plugin is designed to run the Bintray upload Gradle task against all of your modules with the Bintray upload plugin installed. 
 
 ### Options
 
-| Options       | Description                                 |  Default  |
-|---------------|---------------------------------------------|-----------|
-| `podLint`     | Whether to lint the pod or not.             | `true`    |
-| `podLintArgs` | Extra arguments to pass to `pod lib lint`   |           |
-| `podPushArgs` | Extra arguments to pass to `pod trunk push` |           |
+| Options            | Description                                                                               | Default  |
+|--------------------|-------------------------------------------------------------------------------------------|----------|
+| `checkAuthEnvVars` | Whether to check if `BINTRAY_USERNAME` and `BINTRAY_KEY` set to authenticate with Bintray | `true`   |
 
 ##### Examples
 
@@ -63,12 +58,9 @@ Here is an example on how to set options
 ```json
 {
   "plugins": [
-    "@semantic-release/github",
-    ["semantic-release-cocoapods", {
-      "podLint": false,
-      "podLintArgs": "--allow-warnings",
+    ["semantic-release-android-jcenter", {
+      "checkAuthEnvVars": false
     }]
   ]
 }
 ```
-
