@@ -3,6 +3,8 @@
 
 # semantic-release-android-jcenter
 
+*No longer maintained: JCenter [is being sunset](https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/) and therefore, it's not suggested that you publish Android libraries to JCenter anymore. Because of this, this project is no longer being maintained and will be archived (read-only) so it will still function in your workflow, but the project will not be maintained.*
+
 [**semantic-release**](https://github.com/semantic-release/semantic-release) plugin to deploy an Android library to the JCenter Maven repository (well, technically we deploy to a [Bintray](https://bintray.com) Maven repository which can then get accepted into JCenter. See [this faq](https://github.com/levibostian/Android-JCenter#faq) to learn more).
 
 > Tip: If you're an Android developer and you are not sure where to start to get your Android library into JCenter, [check out this project](https://github.com/levibostian/Android-JCenter) to help you out. If you use that guide, you can use this plugin with ease. 
